@@ -23,9 +23,11 @@ app.post('/bot', async (req, res) => {
 		chat_id: req.body.message.from.id,
 		text: JSON.stringify(req.body, null, 4)
 	});
-	res.end();
+	
+	res.header('Content-Type', 'text/html');
+	res.status(200)end();
 });
 
-app.listen(process.env.MYRMD_NET_PORT, () => {
-	console.log("[i] Ran at", process.env.MYRMD_NET_PORT);
+app.listen(process.env.MYRMD_NET_PORT || 8080, () => {
+	console.log("[i] Ran at", process.env.MYRMD_NET_PORT || 8080);
 });
