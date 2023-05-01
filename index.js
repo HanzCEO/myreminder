@@ -25,7 +25,7 @@ app.post('/bot', async (req, res) => {
 	});
 	
 	res.header('Content-Type', 'text/html');
-	res.status(200)end();
+	res.status(200).end();
 });
 
 app.listen(process.env.MYRMD_NET_PORT || 8080, () => {
