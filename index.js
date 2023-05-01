@@ -18,6 +18,8 @@ const teleapi = axios.create({
 });
 const app = express();
 
+app.use(express.json());
+
 app.post('/bot', async (req, res) => {
 	await teleapi.post('/sendMessage', {
 		chat_id: req.body.message.from.id,
