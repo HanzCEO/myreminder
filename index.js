@@ -29,7 +29,8 @@ app.post('/bot', async (req, res) => {
 });
 
 const stages = {
-	'menu': menuStage
+	'menu': menuStage,
+	'newhabit': newhabitStage
 };
 
 function getSender(update) {
@@ -67,6 +68,23 @@ async function menuStage(update) {
 			habits.map(h => `${h.id} - ${h.activity}`).join('\n')
 		);
 	}
+
+	if (txt == "/newhabit") {
+		session.stage = "newhabit";
+		await sendMessage(
+			getSender(update).id,
+			"What is the name of the activity?"
+		);
+	}
+}
+
+async function newhabitStage(update) {
+	await sendMessage(
+		getSender(update).id,
+		"That is very good! Habit added to list.\n" +
+		"Type /newhabit to add more and /habits to list all of yours."
+	);
+	session.stage = 'menu';
 }
 
 app.listen(process.env.MYRMD_NET_PORT || 8080, () => {
