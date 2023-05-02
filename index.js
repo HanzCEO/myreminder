@@ -86,6 +86,10 @@ async function newhabitStage(update) {
 		"Type /newhabit to add more and /habits to list all of yours."
 	);
 	session.stage = 'menu';
+	await pool.promise().execute(
+		"INSERT INTO habits (activity, date_added) VALUES (?, now())",
+		[getMessageText(update)]
+	);
 }
 
 app.listen(process.env.MYRMD_NET_PORT || 8080, () => {
