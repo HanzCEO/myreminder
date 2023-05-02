@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const axios = require('axios');
-const mysql = require('mysql2/promise');
+const mysql = require('mysql2');
 
 const pool = mysql.createPool({
 	host: process.env.MYRMD_HOST,
