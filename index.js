@@ -49,7 +49,16 @@ app.get('/cron', async (req, res) => {
 				await sendMessage(
 					session.chatId,
 					"Hey! Have you done this?\n" +
-					rmd['activity']
+					rmd['activity'],
+
+					{
+						reply_markup: {
+							inline_keyboard: [
+								{ text: 'Not yet', callback_data: `no-${rmd['id']}` },
+								{ text: 'Yes', callback_data: `yes-${rmd['id']}` }
+							]
+						}
+					}
 				);
 				retval.push(rmd);
 			}
@@ -74,17 +83,18 @@ const stages = {
 };
 
 function getSender(update) {
-	return update.message.from;
+	return update.message?.from || update.callback_query?.from;
 }
 
 function getMessageText(update) {
 	return update.message.text;
 }
 
-async function sendMessage(chatId, msg) {
+async function sendMessage(chatId, msg, opts) {
 	await teleapi.post('/sendMessage', {
 		chat_id: chatId,
-		text: msg
+		text: msg,
+		...opts
 	});
 }
 
