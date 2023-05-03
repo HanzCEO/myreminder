@@ -53,10 +53,10 @@ app.get('/cron', async (req, res) => {
 
 					{
 						reply_markup: {
-							inline_keyboard: [
+							inline_keyboard: [[
 								{ text: 'Not yet', callback_data: `no-${rmd['id']}` },
 								{ text: 'Yes', callback_data: `yes-${rmd['id']}` }
-							]
+							]]
 						}
 					}
 				);
