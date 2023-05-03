@@ -18,11 +18,49 @@ const teleapi = axios.create({
 	}
 });
 const app = express();
-const session = { stage: 'menu' };
+const session = { stage: 'menu', chatId: 0 };
 
 app.use(express.json());
 
+app.get('/data', (req, res) => {
+	res.json({time: new Date(), session});
+});
+
+app.get('/cron', async (req, res) => {
+	const conn = pool.promise();
+
+	const [reminders] = await conn.query(`
+		SELECT r.*, h.activity FROM reminders r
+			LEFT JOIN habits h ON h.id = r.target
+	`);
+
+	const retval = [];
+	for (const rmd of reminders) {
+		let [hour, minute, second] = rmd['hour'].split(':').map(Number);
+		let lastUsed = new Date(rmd['last_used']);
+		// let lastUsed = new Date(Number(rmd['last_used']));
+		let perXday = Number(rmd['perXday']);
+
+		if (Math.floor((Date.now() - lastUsed.getTime()) / (3600 * 24 * perXday)) > 0) {
+			// Day >= 1
+			// Check if time is now
+			let dat = new Date();
+			if ((hour - Number(process.env.MYRMD_TZ)) % 24 == dat.getHours() && minute == dat.getMinutes()) {
+				await sendMessage(
+					session.chatId,
+					"Hey! Have you done this?\n" +
+					rmd['activity']
+				);
+				retval.push(rmd);
+			}
+		}
+	}
+
+	res.json({r:retval, r1: reminders, h: process.env.MYRMD_TZ});
+});
+
 app.post('/bot', async (req, res) => {
+	session.chatId = getSender(req.body).id;
 	await stages[session.stage](req.body);
 	
 	res.header('Content-Type', 'text/html');
@@ -120,7 +158,7 @@ async function setnewreminderStage(update) {
 			`Reminder for ${session.target} fully set ` +
 			`at ${session.hours} each ${session.perXday} day.`
 		);
-		session = { stage: 'menu' };
+		session = { stage: 'menu', chatId: session.chatId };
 	}
 
 	return res;
